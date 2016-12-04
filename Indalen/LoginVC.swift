@@ -33,7 +33,8 @@ class LoginVC: UIViewController {
                 if error == nil {
                     print("Fahad: Logged in with email and password")
                     if let user = user {
-                        self.completeSignIn(id: user.uid)
+                        let userdata = ["provider": user.providerID]
+                        self.completeSignIn(id: user.uid , userdata: userdata )
                         
                     }
                     
@@ -44,7 +45,8 @@ class LoginVC: UIViewController {
                         } else {
                             print("Successfully Authenticated With Firebase")
                             if let user = user {
-                                self.completeSignIn(id: user.uid)
+                                let userdata = ["provider": user.providerID]
+                                self.completeSignIn(id: user.uid , userdata: userdata )
                                 
                             }
                         }
@@ -56,12 +58,7 @@ class LoginVC: UIViewController {
         
     }
     
-    
-    
-    
-    
-    
-    
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,8 +96,6 @@ class LoginVC: UIViewController {
     }
     
     
-    
-    
     func FirebaseAuth(_ credentials: FIRAuthCredential) {
         FIRAuth.auth()?.signIn(with: credentials, completion: { (user, error) in
             if error != nil {
@@ -108,7 +103,9 @@ class LoginVC: UIViewController {
             } else {
                 print("Authenticated with firebase")
                 if let user = user {
-                    self.completeSignIn(id: user.uid)
+                    let userdata = ["provider": credentials.provider]
+                    print(credentials.provider)
+                    self.completeSignIn(id: user.uid , userdata: userdata )
                     
                 }
 
@@ -124,7 +121,8 @@ class LoginVC: UIViewController {
     
     
     
-    func completeSignIn(id: String) {
+    func completeSignIn(id: String , userdata: Dictionary<String, String>) {
+        DataService.db.createUserDB(uid: id, userdata: userdata)
         KeychainWrapper.standard.set(id, forKey: key_uid)
         performSegue(withIdentifier: "feed", sender: nil)
     }
