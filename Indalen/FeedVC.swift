@@ -13,6 +13,8 @@ import SwiftKeychainWrapper
 class FeedVC: UIViewController , UITableViewDelegate , UITableViewDataSource {
     @IBOutlet weak var tableView: UITableView!
 
+    var posts = [Post]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -20,6 +22,23 @@ class FeedVC: UIViewController , UITableViewDelegate , UITableViewDataSource {
         
         tableView.delegate = self
         tableView.dataSource = self
+        
+        DataService.db.DB_POSTS.observe(.value , with:{ (snapshot) in //listener
+           // print(snapshot.value )
+            
+            if let snapshot = snapshot.children.allObjects as? [FIRDataSnapshot] {
+                for snap in snapshot {
+                    print("Snap: \(snap)")
+                    
+                    if let postDict = snap.value as? Dictionary <String , AnyObject> {
+                        let key = snap.key
+                        let post = Post(postkey: key, postdata: postDict)
+                        self.posts.append(post)
+                    }
+                }
+            }
+            self.tableView.reloadData()
+        })
     }
     
     
@@ -42,10 +61,13 @@ class FeedVC: UIViewController , UITableViewDelegate , UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return posts.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let post = posts[indexPath.row]
+        print("Fahad: \(post.caption)")
         return (tableView.dequeueReusableCell(withIdentifier: "cell") as? PostsCell)!
     }
     
