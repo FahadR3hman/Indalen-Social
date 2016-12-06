@@ -15,6 +15,7 @@ class FeedVC: UIViewController , UITableViewDelegate , UITableViewDataSource , U
     
     @IBOutlet weak var addImage: ImageCircle!
     
+    @IBOutlet weak var addCaption: RoundTextField!
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -22,6 +23,7 @@ class FeedVC: UIViewController , UITableViewDelegate , UITableViewDataSource , U
     var imagePicker : UIImagePickerController!
     
     static var imageCache = NSCache<AnyObject, AnyObject>()
+    var imageSelected = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,7 +58,12 @@ class FeedVC: UIViewController , UITableViewDelegate , UITableViewDataSource , U
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let image = info[UIImagePickerControllerEditedImage] as? UIImage {
             addImage.image = image
-        } else {
+            imageSelected = true
+        } else if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            addImage.image = image
+            imageSelected = true
+        }
+        else {
             print("valid image not selected fahad::")
         }
         
@@ -113,7 +120,55 @@ class FeedVC: UIViewController , UITableViewDelegate , UITableViewDataSource , U
         present(imagePicker, animated: true, completion: nil)
     }
     
+    func postToFirebase(imgURL: String) {
+        
+        let firebaseData : Dictionary<String , AnyObject> = [
+        
+            "caption": addCaption.text as AnyObject,
+            "imageURL": imgURL as AnyObject,
+            "likes" : 0 as AnyObject
+        ]
+        
+        let firebasePost = DataService.db.DB_POSTS.childByAutoId()
+        firebasePost.setValue(firebaseData)
+        
+        addCaption.text = ""
+        imageSelected = false
+        addImage.image = UIImage(named: "add-image")
+    }
     
+    
+    @IBAction func postBtnTapped(_ sender: Any) {
+        
+        guard  let caption = addCaption.text, caption != nil else {
+            print("Fahad: There must be a caption")
+            return
+        }
+        
+        guard let img = addImage.image , imageSelected == true else {
+            print("Image Must be selected")
+            return
+        }
+        
+        if let imgData = UIImageJPEGRepresentation(img, 0.2) {
+            
+            let imgID = NSUUID().uuidString
+            let metaData = FIRStorageMetadata()
+            metaData.contentType = "Image/jpeg"
+            
+            DataService.db.storage_folder.child(imgID).put(imgData, metadata: metaData) { (metaData , error) in
+                if error != nil {
+                    print("Error Uploading Image")
+                } else {
+                    print("Image Uploaded successfully to the database")
+                    let downloadURL = metaData?.downloadURL()?.absoluteString
+                    self.postToFirebase(imgURL: downloadURL!)
+                    
+                    
+                }
+            }
+        }
+    }
     
     
     

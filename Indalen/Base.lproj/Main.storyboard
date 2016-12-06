@@ -289,6 +289,9 @@
                                                         <real key="value" value="1"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="postBtnTapped:" destination="mgC-Ap-ZQa" eventType="touchUpInside" id="eYh-Pg-KPF"/>
+                                                </connections>
                                             </button>
                                         </subviews>
                                     </stackView>
@@ -423,6 +426,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="addCaption" destination="fPT-Ru-SeZ" id="EO6-Fk-KHF"/>
                         <outlet property="addImage" destination="hpb-PN-01D" id="RGu-oE-jOl"/>
                         <outlet property="tableView" destination="YKz-PG-FOX" id="kze-EV-Kle"/>
                         <segue destination="BYZ-38-t0r" kind="show" identifier="login" id="xel-dm-1h3"/>
