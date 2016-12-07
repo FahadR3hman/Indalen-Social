@@ -101,13 +101,13 @@ class FeedVC: UIViewController , UITableViewDelegate , UITableViewDataSource , U
             
             if let img = FeedVC.imageCache.object(forKey: post.imageURL as AnyObject) {
                 cell.ConfigureCell(post: post, img: img as? UIImage)
-                return cell
+                
             } else {
                 cell.ConfigureCell(post: post, img: nil)
-                return cell
+                
 
             }
-            
+            return cell
         } else {
             return PostsCell()
         }

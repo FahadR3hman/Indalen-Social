@@ -8,6 +8,7 @@
 
 import Foundation
 import Firebase
+import SwiftKeychainWrapper
 // Adding user to the firebase database.
 
 let db_base = FIRDatabase.database().reference()
@@ -42,6 +43,13 @@ class DataService {
     
     var DB_USERS : FIRDatabaseReference {
         return _DB_USERS
+    }
+    
+    var Db_CURRENT_USER: FIRDatabaseReference {
+         let uid = KeychainWrapper.standard.string(forKey: key_uid)
+        let user = DB_USERS.child(uid!)
+        return user
+        
     }
     
     func createUserDB (uid: String , userdata : Dictionary <String , String>) {
